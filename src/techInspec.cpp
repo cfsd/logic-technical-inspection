@@ -36,12 +36,11 @@ int32_t main(int32_t argc, char **argv) {
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if ((0 == commandlineArguments.count("cid")) || (0 == commandlineArguments.count("verbose"))) {
         std::cout << argv[0] << " not enought input arguments. Assigning default values." << std::endl;
-        std::cout << "Default: " << argv[0] << " --cid=111" << std::endl;
+        std::cout << "Default: " << argv[0] << " --cid=111 --cidBB=150" << std::endl;
         std::cout << "Usage:   " << argv[0] << " --cid=<OpenDaVINCI session>" << std::endl;
     }
 
     const uint16_t cid{(commandlineArguments["cid"].size() != 0) ? static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])) : (uint16_t) 111};
-
 
     cluon::OD4Session od4{cid};
 
@@ -52,14 +51,14 @@ int32_t main(int32_t argc, char **argv) {
 
     auto catchContainer{[&initTime,&readyState](cluon::data::Envelope &&envelope)
       {
-        auto message = cluon::extractMessage<opendlv::proxy::GroundAccelerationRequest>(std::move(a_container));
+        auto message = cluon::extractMessage<opendlv::proxy::SwitchStateReading>(std::move(envelope));
 
         if((envelope.senderStamp()==1401) && message.state()==2 && readyState==false){
           cluon::data::TimeStamp tp = cluon::time::now();
           initTime = (float)(tp.seconds() + tp.microseconds()*1e-6);
           readyState = true;
         }
-        if((envelope.senderStamp()==1401) && message.state()==0 || message.state()==3 || message.state()==4){
+        if((envelope.senderStamp()==1401) && (message.state()==0 || message.state()==3 || message.state()==4)){
           readyState = false;
         }
       }};
