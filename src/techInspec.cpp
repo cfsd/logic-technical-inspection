@@ -33,6 +33,7 @@
 
 int32_t main(int32_t argc, char **argv) {
     int32_t retCode{0};
+    int32_t senderStamp = 316;
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if ((0 == commandlineArguments.count("cid")) || (0 == commandlineArguments.count("verbose"))) {
         std::cout << argv[0] << " not enought input arguments. Assigning default values." << std::endl;
@@ -41,8 +42,10 @@ int32_t main(int32_t argc, char **argv) {
     }
 
     const uint16_t cid{(commandlineArguments["cid"].size() != 0) ? static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])) : (uint16_t) 111};
+    const uint16_t cid{(commandlineArguments["cidBB"].size() != 0) ? static_cast<uint16_t>(std::stoi(commandlineArguments["cidBB"])) : (uint16_t) 150};
 
     cluon::OD4Session od4{cid};
+    cluon::OD4Session od4BB{cidBB};
 
   //  TechInspec techInspec(od4);
 
@@ -55,7 +58,7 @@ int32_t main(int32_t argc, char **argv) {
 
         if((envelope.senderStamp()==1401) && message.state()==2 && readyState==false){
           cluon::data::TimeStamp tp = cluon::time::now();
-          initTime = (float)(tp.seconds() + tp.microseconds()*1e-6);
+          initTime = (double)(tp.seconds() + tp.microseconds()*1e-6);
           readyState = true;
         }
         if((envelope.senderStamp()==1401) && (message.state()==0 || message.state()==3 || message.state()==4)){
@@ -64,6 +67,8 @@ int32_t main(int32_t argc, char **argv) {
       }};
 
       od4.dataTrigger(opendlv::proxy::SwitchStateReading::ID(), catchContainer);
+
+      double t = 0;
 
         // Just sleep as this microservice is data driven.
       using namespace std::literals::chrono_literals;
@@ -74,17 +79,22 @@ int32_t main(int32_t argc, char **argv) {
 
         cluon::data::TimeStamp sampleTime = cluon::time::now();
 
-        od4.send(heartBeat,sampleTime,316);
+        od4BB.send(heartBeat,sampleTime,senderStamp);
 
-        if(readyState==true){
+        if(readyState==true && t < 27.5){
           double currentTime = (double)(sampleTime.seconds() + sampleTime.microseconds()*1e-6);
-          double t = currentTime - (double)initTime;
+          t = currentTime - initTime;
 
           float freq = 0.25;
           opendlv::logic::action::AimPoint aimPoint;
           aimPoint.azimuthAngle((float)(7.5*PI/180*sin(2*PI*freq*t)));
 
-          od4.send(aimPoint,sampleTime,316);
+          od4.send(aimPoint,sampleTime,senderStamp);
+
+        } else if(readyState==true && t > 27.5) {
+          opendlv::proxy::SwitchStateRequest message;
+          message.state(3);
+          od4BB.send(message,sampleTime,senderStamp);
         }
      }
 
