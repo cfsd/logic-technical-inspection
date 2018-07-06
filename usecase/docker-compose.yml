@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+    technicalInspection:
+        image: technical-inspection:v0.0
+        network_mode: "host"
+        command: "techInspec --cid=111"
+    # signalViewer:
+    #     image: chalmersfsd/cfsd18-sim-visualization:pre-release-778bfb6
+    #     network_mode: "host"
+    #     command: "--cid=219"
+
+    steering:
+        image: steering:test
+        network_mode: "host"
+        command: "steering --cidSteering=219"
+
+    odrecorderh264:
+         image: seresearch/opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest
+         network_mode: host
+         volumes:
+         - ~/Recordings:/opt/Recordings
+         working_dir: "/opt/Recordings"
+         ipc: host
+         user: odv
+         depends_on:
+             - odsupercomponent
+         command: "/opt/od4/bin/odrecorderh264 --cid=219"
+
+    odsupercomponent:
+            image: seresearch/opendlv-cfsd18-on-opendlv-lynx-on-opendlv-on-opendlv-core-on-opendavinci-on-base:latest
+            network_mode: "host"
+            volumes:
+            - .:/opt/opendlv.data
+            command: "/opt/od4/bin/odsupercomponent --cid=219 --verbose=0 --configuration=/opt/opendlv.data/configuration"
