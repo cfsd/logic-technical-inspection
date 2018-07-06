@@ -52,7 +52,7 @@ int32_t main(int32_t argc, char **argv) {
     double initTime;
     bool readyState = false;
 
-    auto catchContainer{[&initTime,&readyState](cluon::data::Envelope &&envelope)
+    auto catchState{[&initTime,&readyState](cluon::data::Envelope &&envelope)
       {
         auto message = cluon::extractMessage<opendlv::proxy::SwitchStateReading>(std::move(envelope));
 
@@ -66,7 +66,16 @@ int32_t main(int32_t argc, char **argv) {
         }
       }};
 
-      od4.dataTrigger(opendlv::proxy::SwitchStateReading::ID(), catchContainer);
+      od4.dataTrigger(opendlv::proxy::SwitchStateReading::ID(), catchState);
+      float groundSteering = 0;
+
+      auto catchSteering{[&groundSteering](cluon::data::Envelope &&envelope)
+        {
+          auto message = cluon::extractMessage<opendlv::proxy::GroundSteeringReading>(std::move(envelope));
+          groundSteering = message.groundSteering();
+        }};
+
+      od4.dataTrigger(opendlv::proxy::GroundSteeringReading::ID(), catchSteering);
 
       double t = 0;
 
@@ -81,16 +90,21 @@ int32_t main(int32_t argc, char **argv) {
 
         od4BB.send(heartBeat,sampleTime,senderStamp);
 
-        if(readyState==true && t < 27.5){
-          double currentTime = (double)(sampleTime.seconds() + sampleTime.microseconds()*1e-6);
-          t = currentTime - initTime;
+        double currentTime = (double)(sampleTime.seconds() + sampleTime.microseconds()*1e-6);
+        t = currentTime - initTime;
 
+        if(readyState==true && t < 25.5){
           float freq = 0.25;
           opendlv::logic::action::AimPoint aimPoint;
           aimPoint.azimuthAngle((float)(7.5*PI/180*sin(2*PI*freq*t)));
 
           od4.send(aimPoint,sampleTime,senderStamp);
 
+        } else if(readyState==true && t > 25.5) {
+          opendlv::logic::action::AimPoint aimPoint;
+          float delta = groundSteering - static_cast<float>(groundSteering/(27-t)*0.05f);
+          aimPoint.azimuthAngle(delta);
+          od4.send(aimPoint,sampleTime,senderStamp);
         } else if(readyState==true && t > 27.5) {
           opendlv::proxy::SwitchStateRequest message;
           message.state(3);
