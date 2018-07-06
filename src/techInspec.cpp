@@ -42,7 +42,7 @@ int32_t main(int32_t argc, char **argv) {
     }
 
     const uint16_t cid{(commandlineArguments["cid"].size() != 0) ? static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])) : (uint16_t) 111};
-    const uint16_t cid{(commandlineArguments["cidBB"].size() != 0) ? static_cast<uint16_t>(std::stoi(commandlineArguments["cidBB"])) : (uint16_t) 150};
+    const uint16_t cidBB{(commandlineArguments["cidBB"].size() != 0) ? static_cast<uint16_t>(std::stoi(commandlineArguments["cidBB"])) : (uint16_t) 150};
 
     cluon::OD4Session od4{cid};
     cluon::OD4Session od4BB{cidBB};
