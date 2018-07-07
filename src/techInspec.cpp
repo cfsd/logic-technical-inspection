@@ -91,7 +91,10 @@ int32_t main(int32_t argc, char **argv) {
         od4BB.send(heartBeat,sampleTime,senderStamp);
 
         double currentTime = (double)(sampleTime.seconds() + sampleTime.microseconds()*1e-6);
-        t = currentTime - initTime;
+
+        if(readyState==true){
+          t = currentTime - initTime;
+        }
 
         if(readyState==true && t < 25.5){
           float freq = 0.25;
