@@ -109,7 +109,7 @@ int32_t main(int32_t argc, char **argv) {
           od4BB.send(torqueRequest,sampleTime,1505);
 
 
-        } else if(readyState==true && t > 25.5) {
+        } else if(readyState==true && t > 25.5 && t<=27.5) {
           opendlv::logic::action::AimPoint aimPoint;
           float delta = groundSteering - static_cast<float>(groundSteering/(27-t)*0.05f);
           aimPoint.azimuthAngle(delta);
