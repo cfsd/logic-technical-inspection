@@ -82,7 +82,7 @@ int32_t main(int32_t argc, char **argv) {
         // Just sleep as this microservice is data driven.
       using namespace std::literals::chrono_literals;
       while (od4.isRunning()) {
-        std::this_thread::sleep_for(0.05s);
+        std::this_thread::sleep_for(0.033s);
         opendlv::system::SignalStatusMessage heartBeat;
         heartBeat.code(1);
 
@@ -99,7 +99,7 @@ int32_t main(int32_t argc, char **argv) {
         if(readyState==true && t < 25.5){
           float freq = 0.25;
           opendlv::logic::action::AimPoint aimPoint;
-          aimPoint.azimuthAngle((float)(7.5*PI/180*sin(2*PI*freq*t)));
+          aimPoint.azimuthAngle((float)(10*PI/180*sin(2*PI*freq*t)));
 
           opendlv::proxy::TorqueRequest torqueRequest;
           torqueRequest.torque(150);
