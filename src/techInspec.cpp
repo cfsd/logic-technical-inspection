@@ -101,17 +101,36 @@ int32_t main(int32_t argc, char **argv) {
           opendlv::logic::action::AimPoint aimPoint;
           aimPoint.azimuthAngle((float)(7.5*PI/180*sin(2*PI*freq*t)));
 
+          opendlv::proxy::TorqueRequest torqueRequest;
+          torqueRequest.torque(150);
+
           od4.send(aimPoint,sampleTime,senderStamp);
+          od4BB.send(torqueRequest,sampleTime,1504);
+          od4BB.send(torqueRequest,sampleTime,1505);
+
 
         } else if(readyState==true && t > 25.5) {
           opendlv::logic::action::AimPoint aimPoint;
           float delta = groundSteering - static_cast<float>(groundSteering/(27-t)*0.05f);
           aimPoint.azimuthAngle(delta);
           od4.send(aimPoint,sampleTime,senderStamp);
+
+          opendlv::proxy::TorqueRequest torqueRequest;
+          torqueRequest.torque(0);
+
+          od4BB.send(torqueRequest,sampleTime,1504);
+          od4BB.send(torqueRequest,sampleTime,1505);
+
         } else if(readyState==true && t > 27.5) {
           opendlv::proxy::SwitchStateRequest message;
           message.state(3);
           od4BB.send(message,sampleTime,senderStamp);
+
+          opendlv::proxy::TorqueRequest torqueRequest;
+          torqueRequest.torque(0);
+
+          od4BB.send(torqueRequest,sampleTime,1504);
+          od4BB.send(torqueRequest,sampleTime,1505);
         }
      }
 
