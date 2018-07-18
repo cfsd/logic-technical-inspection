@@ -5,30 +5,31 @@ services:
       image: technical-inspection:latest
       network_mode: "host"
       command: "techInspec --cid=${CIDMain} --cidBB=${cidBB}"
-    # signalViewer:
-    #     image: chalmersfsd/cfsd18-sim-visualization:pre-release-778bfb6
-    #     network_mode: "host"
-    #     command: "--cid=219"
 
     steering:
         image: chalmersfsd/logic-action-steering:pre-release-b0d1def
         network_mode: "host"
         command: "steering --cidSteering=${cidBB}"
 
-    recorder48:
-        image: chrberger/cluon-amd64:latest
-        restart: on-failure
+    cfsd18-sim-visualization:
+        image: chalmersfsd/cfsd18-sim-visualization:pre-release-778bfb6
         network_mode: "host"
-        volumes:
-        - ~/Recordings/date +%Y-%m-%d_%H%M%S:/opt/recordings
-        working_dir: "/opt/recordings"
-        command: sh -c "cluon-OD4toStdout --cid=${CIDMain} > `date +CID-48-recording-%Y-%m-%d_%H%M%S.rec`"
+        command: "--cid=${CIDMain}"
 
-    recorder219:
-        image: chrberger/cluon-amd64:latest
-        restart: on-failure
-        network_mode: "host"
-        volumes:
-        - ~/Recordings/date +%Y-%m-%d_%H%M%S:/opt/recordings
-        working_dir: "/opt/recordings"
-        command: sh -c "cluon-OD4toStdout --cid=${cidBB} > `date +CID-219-recording-%Y-%m-%d_%H%M%S.rec`"
+    # recorder48:
+    #     image: chrberger/cluon-amd64:latest
+    #     restart: on-failure
+    #     network_mode: "host"
+    #     volumes:
+    #     - ~/Recordings/date +%Y-%m-%d_%H%M%S:/opt/recordings
+    #     working_dir: "/opt/recordings"
+    #     command: sh -c "cluon-OD4toStdout --cid=${CIDMain} > `date +CID-48-recording-%Y-%m-%d_%H%M%S.rec`"
+    #
+    # recorder219:
+    #     image: chrberger/cluon-amd64:latest
+    #     restart: on-failure
+    #     network_mode: "host"
+    #     volumes:
+    #     - ~/Recordings/date +%Y-%m-%d_%H%M%S:/opt/recordings
+    #     working_dir: "/opt/recordings"
+    #     command: sh -c "cluon-OD4toStdout --cid=${cidBB} > `date +CID-219-recording-%Y-%m-%d_%H%M%S.rec`"
