@@ -129,8 +129,8 @@ int32_t main(int32_t argc, char **argv) {
           opendlv::proxy::TorqueRequest torqueRequest;
           torqueRequest.torque(0);
 
-          od4BB.send(torqueRequest,sampleTime,1504);
-          od4BB.send(torqueRequest,sampleTime,1505);
+          od4.send(torqueRequest,sampleTime,1504);
+          od4.send(torqueRequest,sampleTime,1505);
         }
      }
 
