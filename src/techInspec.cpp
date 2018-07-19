@@ -105,8 +105,8 @@ int32_t main(int32_t argc, char **argv) {
           torqueRequest.torque(150);
 
           od4.send(aimPoint,sampleTime,senderStamp);
-          od4BB.send(torqueRequest,sampleTime,1504);
-          od4BB.send(torqueRequest,sampleTime,1505);
+          od4BB.send(torqueRequest,sampleTime,1502);
+          od4BB.send(torqueRequest,sampleTime,1503);
 
 
         } else if(readyState==true && t > 25.5 && t<=27.5) {
@@ -118,8 +118,8 @@ int32_t main(int32_t argc, char **argv) {
           opendlv::proxy::TorqueRequest torqueRequest;
           torqueRequest.torque(0);
 
-          od4BB.send(torqueRequest,sampleTime,1504);
-          od4BB.send(torqueRequest,sampleTime,1505);
+          od4BB.send(torqueRequest,sampleTime,1502);
+          od4BB.send(torqueRequest,sampleTime,1503);
 
         } else if(readyState==true && t > 27.5) {
           opendlv::proxy::SwitchStateReading message;
@@ -129,8 +129,8 @@ int32_t main(int32_t argc, char **argv) {
           opendlv::proxy::TorqueRequest torqueRequest;
           torqueRequest.torque(0);
 
-          od4.send(torqueRequest,sampleTime,1504);
-          od4.send(torqueRequest,sampleTime,1505);
+          od4BB.send(torqueRequest,sampleTime,1502);
+          od4BB.send(torqueRequest,sampleTime,1503);
         }
      }
 
