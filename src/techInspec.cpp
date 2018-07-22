@@ -67,18 +67,10 @@ int32_t main(int32_t argc, char **argv) {
       }};
 
       od4.dataTrigger(opendlv::proxy::SwitchStateReading::ID(), catchState);
-      float groundSteering = 0;
-
-      auto catchSteering{[&groundSteering](cluon::data::Envelope &&envelope)
-        {
-          auto message = cluon::extractMessage<opendlv::proxy::GroundSteeringReading>(std::move(envelope));
-          groundSteering = message.groundSteering();
-        }};
-
-      od4.dataTrigger(opendlv::proxy::GroundSteeringReading::ID(), catchSteering);
 
       double t = 0;
-
+      float freq = 0.25;
+      float t1 = 26;
         // Just sleep as this microservice is data driven.
       using namespace std::literals::chrono_literals;
       while (od4.isRunning()) {
@@ -91,46 +83,35 @@ int32_t main(int32_t argc, char **argv) {
         od4BB.send(heartBeat,sampleTime,senderStamp);
 
         double currentTime = (double)(sampleTime.seconds() + sampleTime.microseconds()*1e-6);
+        opendlv::proxy::GroundSteeringRequest groundSteeringRequest;
+        opendlv::proxy::TorqueRequest torqueRequest;
 
         if(readyState==true){
           t = currentTime - initTime;
         }
 
         if(readyState==true && t < 25.5){
-          float freq = 0.25;
-          opendlv::logic::action::AimPoint aimPoint;
-          aimPoint.azimuthAngle((float)(10*PI/180*sin(2*PI*freq*t)));
+          groundSteeringRequest.groundSteering((float)(46.76*20*PI/180*sin(2*PI*freq*t)));
 
-          opendlv::proxy::TorqueRequest torqueRequest;
-          torqueRequest.torque(150);
+          torqueRequest.torque(25);
 
-          od4.send(aimPoint,sampleTime,senderStamp);
+          od4BB.send(groundSteeringRequest,sampleTime,senderStamp);
           od4BB.send(torqueRequest,sampleTime,1502);
           od4BB.send(torqueRequest,sampleTime,1503);
 
 
-        } else if(readyState==true && t > 25.5 && t<=27.5) {
-          opendlv::logic::action::AimPoint aimPoint;
-          float delta = groundSteering - static_cast<float>(groundSteering/(27-t)*0.05f);
-          aimPoint.azimuthAngle(delta);
-          od4.send(aimPoint,sampleTime,senderStamp);
+        } else if(readyState==true && (t > t1 || t>28) ) {
+          groundSteeringRequest.groundSteering(0.0f);
+          od4BB.send(groundSteeringRequest,sampleTime,senderStamp);
 
-          opendlv::proxy::TorqueRequest torqueRequest;
           torqueRequest.torque(0);
 
           od4BB.send(torqueRequest,sampleTime,1502);
           od4BB.send(torqueRequest,sampleTime,1503);
 
-        } else if(readyState==true && t > 27.5) {
+        } else if(readyState==true && t > 29) {
           opendlv::proxy::SwitchStateReading message;
           message.state(1);
-          od4BB.send(message,sampleTime, 1403);
-
-          opendlv::proxy::TorqueRequest torqueRequest;
-          torqueRequest.torque(0);
-
-          od4BB.send(torqueRequest,sampleTime,1502);
-          od4BB.send(torqueRequest,sampleTime,1503);
         }
      }
 
