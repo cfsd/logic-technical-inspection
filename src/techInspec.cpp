@@ -109,7 +109,9 @@ int32_t main(int32_t argc, char **argv) {
           od4BB.send(torqueRequest,sampleTime,1502);
           od4BB.send(torqueRequest,sampleTime,1503);
 
-        } else if(readyState==true && t > 29) {
+        }
+
+        if(readyState==true && t > 29) {
           opendlv::proxy::SwitchStateReading message;
           message.state(1);
         }
