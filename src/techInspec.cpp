@@ -111,9 +111,10 @@ int32_t main(int32_t argc, char **argv) {
 
         }
 
-        if(readyState==true && t > 29) {
+        if(readyState==true && (t > 29 || t > t1+1) ) {
           opendlv::proxy::SwitchStateReading message;
           message.state(1);
+          od4BB.send(message,sampleTime,1403);
         }
      }
 
