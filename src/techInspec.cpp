@@ -93,7 +93,7 @@ int32_t main(int32_t argc, char **argv) {
         if(readyState==true && t < 25.5){
           groundSteeringRequest.groundSteering((float)(46.76*20*PI/180*sin(2*PI*freq*t)));
 
-          torqueRequest.torque(25);
+          torqueRequest.torque(30);
 
           od4BB.send(groundSteeringRequest,sampleTime,senderStamp);
           od4BB.send(torqueRequest,sampleTime,1502);
